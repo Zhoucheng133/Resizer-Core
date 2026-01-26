@@ -7,4 +7,4 @@ edition = "2024"
 image = "0.25.9"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "staticlib"]
