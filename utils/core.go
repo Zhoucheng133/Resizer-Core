@@ -45,7 +45,6 @@ func ResizeHandler(path string, width int, height int, output string) string {
 		err = png.Encode(out, resized)
 	}
 
-	err = png.Encode(out, resized)
 	if err != nil {
 		return fmt.Sprint("ERR: ", err.Error())
 	}
