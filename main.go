@@ -2,7 +2,6 @@ package main
 
 import "C"
 import (
-	"fmt"
 	"resizer_core/utils"
 )
 
@@ -21,6 +20,4 @@ func GetSize(path *C.char) *C.char {
 	return C.CString(utils.GetSizeHandler(C.GoString(path)))
 }
 
-func main() {
-	fmt.Println(utils.GetSizeHandler("/Users/zhoucheng/Downloads/照片/DSC_2636.jpg"))
-}
+func main() {}
