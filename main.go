@@ -11,8 +11,9 @@ func Resize(
 	width C.int,
 	height C.int,
 	output *C.char,
+	stretch C.int,
 ) *C.char {
-	return C.CString(utils.ResizeHandler(C.GoString(path), int(width), int(height), C.GoString(output)))
+	return C.CString(utils.ResizeHandler(C.GoString(path), int(width), int(height), C.GoString(output), stretch != 0))
 }
 
 //export GetSize
