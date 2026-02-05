@@ -1,6 +1,6 @@
 # Resizer Core
 
-这是Reizer核心模块
+这是[Reizer](https://github.com/Zhoucheng133/Resizer)核心模块
 
 你可以使用下面的命令生成动态库
 
