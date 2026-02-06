@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/color"
@@ -15,6 +16,12 @@ import (
 	"github.com/chai2010/webp"
 	"github.com/nfnt/resize"
 )
+
+type ConvertItem struct {
+	Path   string `json:"path"`
+	Width  string `json:"width"`
+	Height string `json:"height"`
+}
 
 func ResizeHandler(path string, width int, height int, output string, stretch bool) string {
 	file, err := os.Open(path)
@@ -97,4 +104,59 @@ func GetSizeHandler(path string) string {
 		return fmt.Sprint("ERR: ", err.Error())
 	}
 	return fmt.Sprint(config.Width, "x", config.Height)
+}
+
+func checkImage(path string) bool {
+	file, err := os.Open(path)
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+	_, _, err = image.DecodeConfig(file)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func ReadDirHandler(srcDir string) string {
+
+	var ls []ConvertItem
+
+	err := filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if !checkImage(path) {
+			return nil
+		}
+		size := GetSizeHandler(path)
+		if strings.HasPrefix(size, "ERR") {
+			return nil
+		}
+
+		width := strings.Split(size, "x")[0]
+		height := strings.Split(size, "x")[1]
+
+		ls = append(ls, ConvertItem{
+			Path:   filepath.Base(path),
+			Width:  width,
+			Height: height,
+		})
+		return nil
+	})
+
+	if err != nil {
+		return fmt.Sprint("ERR: ", err.Error())
+	}
+
+	jsonData, err := json.Marshal(ls)
+	if err != nil {
+		return "ERR: JSON marshal failed"
+	}
+
+	return string(jsonData)
 }
