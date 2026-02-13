@@ -121,36 +121,39 @@ func checkImage(path string) bool {
 
 func ReadDirHandler(srcDir string) string {
 
-	var ls []ConvertItem
+	ls := make([]ConvertItem, 0)
 
-	err := filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	entries, err := os.ReadDir(srcDir)
+	if err != nil {
+		return fmt.Sprintf("ERR: %v", err)
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
 		}
-		if info.IsDir() {
-			return nil
-		}
+
+		path := filepath.Join(srcDir, entry.Name())
+
 		if !checkImage(path) {
-			return nil
+			continue
 		}
+
 		size := GetSizeHandler(path)
 		if strings.HasPrefix(size, "ERR") {
-			return nil
+			continue
 		}
 
-		width := strings.Split(size, "x")[0]
-		height := strings.Split(size, "x")[1]
+		dimensions := strings.Split(size, "x")
+		if len(dimensions) < 2 {
+			continue
+		}
 
 		ls = append(ls, ConvertItem{
-			Path:   filepath.Base(path),
-			Width:  width,
-			Height: height,
+			Path:   entry.Name(),
+			Width:  dimensions[0],
+			Height: dimensions[1],
 		})
-		return nil
-	})
-
-	if err != nil {
-		return fmt.Sprint("ERR: ", err.Error())
 	}
 
 	jsonData, err := json.Marshal(ls)
